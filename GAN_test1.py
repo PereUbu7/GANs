@@ -36,15 +36,15 @@ def get_random_z(z_dim, batch_size):
 # define discriminator
 def make_discriminaor(input_shape, generator_output_shape):
     y_input = tf.keras.Input(generator_output_shape, name=f'y_Input')
-    y_layer1 = tf.keras.layers.Dense(units=10, activation='relu', kernel_regularizer=regularizers.L2(0.01), name=f'y_layer_1')(y_input)
-    y_layer2 = tf.keras.layers.Dense(units=20, activation='relu', kernel_regularizer=regularizers.L2(0.01), name=f'y_layer_2')(y_layer1)
+    y_layer1 = tf.keras.layers.Dense(units=10, activation='relu', kernel_regularizer=regularizers.L2(0.1), name=f'y_layer_1')(y_input)
+    y_layer2 = tf.keras.layers.Dense(units=20, activation='relu', kernel_regularizer=regularizers.L2(0.1), name=f'y_layer_2')(y_layer1)
 
     p_input = tf.keras.Input(input_shape, name=f'p_Input')
-    p_layer1 = tf.keras.layers.Dense(units=10, activation='relu', kernel_regularizer=regularizers.L2(0.01), name=f'p_layer_1')(p_input)
-    p_layer2 = tf.keras.layers.Dense(units=20, activation='relu', kernel_regularizer=regularizers.L2(0.01), name=f'p_layer_2')(p_layer1)
+    p_layer1 = tf.keras.layers.Dense(units=10, activation='relu', kernel_regularizer=regularizers.L2(0.1), name=f'p_layer_1')(p_input)
+    p_layer2 = tf.keras.layers.Dense(units=20, activation='relu', kernel_regularizer=regularizers.L2(0.1), name=f'p_layer_2')(p_layer1)
 
     core_input = tf.keras.layers.Add()([y_layer2, p_layer2])
-    c_layer1 = tf.keras.layers.Dense(units=10, activation='relu', kernel_regularizer=regularizers.L2(0.01), name=f'c_layer_1')(core_input)
+    c_layer1 = tf.keras.layers.Dense(units=10, activation='relu', kernel_regularizer=regularizers.L2(0.1), name=f'c_layer_1')(core_input)
     c_layer2 = tf.keras.layers.Dense(units=1, activation='sigmoid', name=f'c_layer_2')(c_layer1)
 
     return tf.keras.Model(inputs=[y_input, p_input], outputs=c_layer2)
@@ -74,7 +74,7 @@ def make_generator(input_shape):
 def get_loss_fn():
     def d_loss_fn(real_logits, fake_logits):
         # return tf.reduce_mean(fake_logits) - tf.reduce_mean(real_logits)
-        return -tf.reduce_mean(tf.math.log(real_logits + 1e-5) + tf.math.log(1. - fake_logits + 1e-5))
+        return -tf.reduce_mean(tf.math.log(fake_logits + 1e-5) + tf.math.log(1. - real_logits + 1e-5))
 
     def g_loss_fn(fake_logits):
         return -tf.reduce_mean(tf.math.log(fake_logits/(1-fake_logits)))
