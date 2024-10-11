@@ -72,13 +72,16 @@ def make_generator(input_shape):
 
 # define loss function
 def get_loss_fn():
+    # Least Squared Error
+    criterion = tf.keras.losses.MeanSquaredError()
+
     def d_loss_fn(real_logits, fake_logits):
-        # return tf.reduce_mean(fake_logits) - tf.reduce_mean(real_logits)
-        return -tf.reduce_mean(tf.math.log(real_logits + 1e-5) + tf.math.log(1. - fake_logits + 1e-5))
+        real_loss = criterion(tf.ones_like(real_logits), real_logits)
+        fake_loss = criterion(tf.zeros_like(fake_logits), fake_logits)
+        return real_loss + fake_loss
 
     def g_loss_fn(fake_logits):
-        return -tf.reduce_mean(tf.math.log(fake_logits/(1-fake_logits)))
-        # return -tf.reduce_mean(tf.math.log(fake_logits + 1e-5))
+        return criterion(tf.ones_like(fake_logits), fake_logits)
 
     return d_loss_fn, g_loss_fn
 
